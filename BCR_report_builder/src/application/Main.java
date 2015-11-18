@@ -1,17 +1,39 @@
 package application;
 	
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 
 
 public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			BorderPane root = new BorderPane();
-			Scene scene = new Scene(root,400,400);
+			primaryStage.setTitle("JavaFX");
+			
+			GridPane root = new GridPane();
+			root.setAlignment(Pos.CENTER);
+			Button createReport = new Button("Create Report");
+			createReport.setId("menu-buttons");
+			Button editReport = new Button("Edit Report");
+			editReport.setId("menu-buttons");
+			Button deleteReport = new Button("Delete Report");
+			deleteReport.setId("menu-buttons");
+			root.add(createReport, 0, 3, 2, 2);
+			root.add(editReport, 2, 3, 2, 2 );
+			root.add(deleteReport, 4, 3, 2, 2);
+			Text scenetitle = new Text("Welcome");
+			scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+			root.add(scenetitle, 0, 0, 2, 1);
+			
+			Scene scene = new Scene(root,600,600);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.show();

@@ -19,6 +19,7 @@ public class ReportDriver {
 	 * @param args
 	 * @throws FileNotFoundException 
 	 */
+	/*
 	public static void main(String[] args) throws FileNotFoundException {
 		
 		Report r1 = new Report("JWR", "No comments");
@@ -33,6 +34,6 @@ public class ReportDriver {
 		pw.write(r1.getComments() + "," + r1.getInitials());
 		pw.close();
 		System.out.println("Success");
-	}
+	}*/
 
 }
