@@ -16,13 +16,13 @@ public class Cell {
 		this.alive = alive;
 	}
 	
-	public char getAliveShape() {
-		return shape[0];
-	}
-	
-	public char getDeadShape() {
-		return shape[1];
-	}
+    public char getAliveShape() {
+            return shape[1];
+    }
+
+    public char getDeadShape() {
+            return shape[0];
+    }
 	
 	public char getCurrentShape() {
 		return this.shape[this.alive];
