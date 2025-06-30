@@ -1,3 +1,4 @@
+ev2qu2-codex/create-module-for-gui-and-visual-improvement
 package application;
 
 public class ReportBuilderException extends Exception {
@@ -19,3 +20,21 @@ public class ReportBuilderException extends Exception {
         super(cause);
     }
 }
+=======
+package application;
+
+public class ReportBuilderException extends Exception{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+		/*
+		 * TODO:
+		 * 		Create the necessary exception infrastructure
+		 * 		
+		 */
+
+}
+ master
