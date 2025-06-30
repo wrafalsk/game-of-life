@@ -1,3 +1,4 @@
+package com.example.gameoflife;
 
 public class Cell {
 	private int alive;
