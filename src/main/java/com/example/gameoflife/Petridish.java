@@ -1,3 +1,4 @@
+package com.example.gameoflife;
 import java.util.Random;
 import java.util.Stack;
 
@@ -100,8 +101,8 @@ public class Petridish {
 		 * 
 		 */
 
-		Stack<cellPosition> listOfDeadCells = new Stack<cellPosition>();
-		Stack<cellPosition> listOfNewCells = new Stack<cellPosition>();
+		Stack<CellPosition> listOfDeadCells = new Stack<CellPosition>();
+		Stack<CellPosition> listOfNewCells = new Stack<CellPosition>();
 
 		this.determineDyingCells(listOfDeadCells);
 		this.spawnNewCells(listOfNewCells);
@@ -123,31 +124,31 @@ public class Petridish {
 	 * 1)Any live cell with less than two live neighbours dies, as if from under population.
 	 * 3)Any live cell with more than three live neighbours dies, as if by overcrowding.
 	 * 
-	 * This method takes a stack object of type cellPosition and calls the checkNighbors() method,
+	 * This method takes a stack object of type CellPosition and calls the checkNighbors() method,
 	 * which it then uses to determine what cells should be selected to be made dead. Since the
 	 * checkneighbors() function returns true if there exists 2 or 3 cells, the function's returned
 	 * boolean value is negated in order to determine if the first and third rule apply to this 
 	 * iteration.
 	 * 
 	 * The method begins by declaring a inner class called 
-	 * cellPosition which has two integer fields: 
+	 * CellPosition which has two integer fields: 
 	 * 1) row
 	 * 2) column
 	 * 
 	 * This inner class is responsible for keeping track of cells that are selected to
 	 * be made dead. 
 	 * 
-	 * The Stack of type cellPosition is used to contain the many possible instances of
-	 * cellPosition.
+	 * The Stack of type CellPosition is used to contain the many possible instances of
+	 * CellPosition.
 	 */
-	private void determineDyingCells(Stack<cellPosition> listOfDeadCells){
+	private void determineDyingCells(Stack<CellPosition> listOfDeadCells){
 		
 		for(int rows = 0; rows < PETRI_SIZE_ROWS; rows++){
 			for(int columns = 0; columns < PETRI_SIZE_COLS; columns++){
 				if(this.cellArena[columns][rows].getAlive() == 1){
 					if(!this.checkNeighbors(columns, rows)){
 						//System.out.printf("Success. It works at: row %d | column %d%n", rows, columns);
-						listOfDeadCells.push(new cellPosition(rows, columns));
+						listOfDeadCells.push(new CellPosition(rows, columns));
 					}
 				}
 			}
@@ -161,11 +162,11 @@ public class Petridish {
 	 * 
 	 * 4)Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 	 * 
-	 * This method takes a stack object of type cellPosition and calls the, 
+	 * This method takes a stack object of type CellPosition and calls the, 
 	 * checkNighborsExactlyThree() method, which it then uses to determine what
 	 * cells should be selected to be made alive.
 	 * 
-	 * The method begins by declaring an object of the cellPosition class
+	 * The method begins by declaring an object of the CellPosition class
 	 * which has two integer fields: 
 	 * 1) row
 	 * 2) column
@@ -173,16 +174,16 @@ public class Petridish {
 	 * This inner class is responsible for keeping track of cells(two dimensional element) that 
 	 * are selected to be made alive.
 	 * 
-	 * The Stack of type cellPosition is passed in and used to contain the many potential instances of
-	 * cellPosition.
+	 * The Stack of type CellPosition is passed in and used to contain the many potential instances of
+	 * CellPosition.
 	 */
-	private void spawnNewCells(Stack<cellPosition> listOfNewCells){
+	private void spawnNewCells(Stack<CellPosition> listOfNewCells){
 		for(int rows = 0; rows < PETRI_SIZE_ROWS; rows++){
 			for(int columns = 0; columns < PETRI_SIZE_COLS; columns++){
 				if(this.cellArena[columns][rows].getAlive() == 0){
 					if(this.checkNeighborsExactlyThree(columns, rows)){
 						//System.out.printf("Success. It works at: row %d | column %d%n", rows, columns);
-						listOfNewCells.push(new cellPosition(rows, columns));
+						listOfNewCells.push(new CellPosition(rows, columns));
 					}
 				}
 			}

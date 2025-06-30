@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.gameoflife.GameController">
+    <top>
+        <Text text="Enter a number for the Seed value." />
+    </top>
+    <center>
+        <HBox spacing="10">
+            <Text text="Seed value:" />
+            <TextField fx:id="seedField" text="0-40" />
+            <Button text="Enter Value" onAction="#handleInput" />
+        </HBox>
+    </center>
+    <bottom>
+        <Text fx:id="actionText" />
+    </bottom>
+</BorderPane>
