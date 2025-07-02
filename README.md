@@ -21,3 +21,9 @@ The runnable JAR is created in `build/libs/game-of-life.jar`.
 ```
 ./gradlew test
 ```
+
+## Archive
+
+The old `BCR_report_builder` project was moved to its own repository and
+removed from this build. The `archive/` directory is ignored so it no longer
+appears in builds or source packages.
