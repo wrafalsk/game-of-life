@@ -8,14 +8,47 @@ public class Petridish {
 	private Cell [][] cellArena;
 	private int cellGeneration;
 
-	Petridish(){
-		this.cellArena = new Cell[PETRI_SIZE_COLS][PETRI_SIZE_ROWS];
-		for(int columns = 0; columns < PETRI_SIZE_COLS; columns++){
-			for(int rows = 0; rows < PETRI_SIZE_ROWS; rows++){
-				this.cellArena[columns][rows] = new Cell();
-			}
-		}
-	}
+        Petridish(){
+                this.cellArena = new Cell[PETRI_SIZE_COLS][PETRI_SIZE_ROWS];
+                for(int columns = 0; columns < PETRI_SIZE_COLS; columns++){
+                        for(int rows = 0; rows < PETRI_SIZE_ROWS; rows++){
+                                this.cellArena[columns][rows] = new Cell();
+                        }
+                }
+        }
+
+        /**
+         * Set the alive state of a specific cell using PETRI_SIZE column/row
+         * coordinates. Species is always set to normal for tests.
+         */
+        public void setCellState(int column, int row, boolean alive){
+                Cell c = this.cellArena[column][row];
+                if(alive){
+                        c.makeAlive();
+                        c.setSpecies(Cell.SPECIES_NORMAL);
+                } else {
+                        c.makeDead();
+                }
+        }
+
+        /** Return true if the given cell is alive. */
+        public boolean isCellAlive(int column, int row){
+                return this.cellArena[column][row].getAlive() == 1;
+        }
+
+        /**
+         * Compute a string hash of the current board state. Each cell's
+         * character representation is concatenated in row-major order.
+         */
+        public String getBoardHash(){
+                StringBuilder sb = new StringBuilder(PETRI_SIZE_ROWS*PETRI_SIZE_COLS);
+                for(int columns = 0; columns < PETRI_SIZE_COLS; columns++){
+                        for(int rows = 0; rows < PETRI_SIZE_ROWS; rows++){
+                                sb.append(this.cellArena[columns][rows].getCurrentShape());
+                        }
+                }
+                return sb.toString();
+        }
 	
 	/*
 	 * disply()
@@ -600,18 +633,35 @@ public class Petridish {
 	 * and returning back to the GameofLife scope.
 	 * 
 	 */ 
-        public void iterateLife() throws Exception {
+        /**
+         * Iterate the simulation until it stabilizes or the supplied
+         * {@code continueRunning} callback returns {@code false}.
+         */
+        public void iterateLife(java.util.function.Supplier<Boolean> continueRunning) throws Exception {
                 int timer = 0;
-                while(this.checkLivingCells()){
+                java.util.Set<String> seen = new java.util.HashSet<>();
+                String previous = getBoardHash();
+                seen.add(previous);
+                while(this.checkLivingCells() && continueRunning.get()){
                         this.checkLifeConditions();
                         this.applyCoexistentBehavior();
                         this.applyAggressiveBehavior();
+                        String current = getBoardHash();
+                        if(current.equals(previous) || !seen.add(current)){
+                                break;
+                        }
                         this.display();
                         Thread.sleep(250);
-			timer++;
-			if(timer == 400){
-				break;
-			}
-		}
-	}
+                        previous = current;
+                        timer++;
+                        if(timer == 400){
+                                break;
+                        }
+                }
+        }
+
+        /** Convenience wrapper that always continues running. */
+        public void iterateLife() throws Exception {
+                iterateLife(() -> true);
+        }
 }
