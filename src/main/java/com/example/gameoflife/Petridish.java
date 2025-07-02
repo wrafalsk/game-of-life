@@ -84,10 +84,11 @@ public class Petridish {
 		for(int i = 0; i < this.PETRI_SIZE_COLS + this.PETRI_SIZE_ROWS + seed; ){
 			rnum1 = (0 + (1 + rand.nextInt(this.PETRI_SIZE_COLS-1)));
 			rnum2 = (0 + (1 + rand.nextInt(this.PETRI_SIZE_ROWS-1)));
-			if(this.cellArena[rnum1][rnum2].getAlive() != 1){
-				this.cellArena[rnum1][rnum2].makeAlive();
-				i++;
-			}
+                        if(this.cellArena[rnum1][rnum2].getAlive() != 1){
+                                this.cellArena[rnum1][rnum2].makeAlive();
+                                this.cellArena[rnum1][rnum2].setSpecies(Cell.SPECIES_NORMAL);
+                                i++;
+                        }
 		}
 		this.display();
 	}
@@ -106,10 +107,12 @@ public class Petridish {
 
 		this.determineDyingCells(listOfDeadCells);
 		this.spawnNewCells(listOfNewCells);
-		while(!listOfNewCells.isEmpty()){
-			this.cellArena[listOfNewCells.peek().column][listOfNewCells.peek().row].makeAlive();
-			listOfNewCells.pop();
-		}
+                while(!listOfNewCells.isEmpty()){
+                        CellPosition pos = listOfNewCells.pop();
+                        Cell newCell = this.cellArena[pos.column][pos.row];
+                        newCell.makeAlive();
+                        newCell.setSpecies(Cell.SPECIES_NORMAL);
+                }
 		while(!listOfDeadCells.isEmpty()){
 			this.cellArena[listOfDeadCells.peek().column][listOfDeadCells.peek().row].makeDead();
 			listOfDeadCells.pop();
@@ -145,12 +148,12 @@ public class Petridish {
 		
 		for(int rows = 0; rows < PETRI_SIZE_ROWS; rows++){
 			for(int columns = 0; columns < PETRI_SIZE_COLS; columns++){
-				if(this.cellArena[columns][rows].getAlive() == 1){
-					if(!this.checkNeighbors(columns, rows)){
-						//System.out.printf("Success. It works at: row %d | column %d%n", rows, columns);
-						listOfDeadCells.push(new CellPosition(rows, columns));
-					}
-				}
+                                if(this.cellArena[columns][rows].getAlive() == 1 &&
+                                   this.cellArena[columns][rows].getSpecies() != Cell.SPECIES_COEXISTENT){
+                                        if(!this.checkNeighbors(columns, rows)){
+                                                listOfDeadCells.push(new CellPosition(rows, columns));
+                                        }
+                                }
 			}
 		}
 	}
@@ -345,7 +348,7 @@ public class Petridish {
 	 * If there are none, it returns false.
 	 * 
 	 */ 
-	private boolean checkNeighborsExactlyThree(int column, int row){
+        private boolean checkNeighborsExactlyThree(int column, int row){
 		int numNeighbors = 0;			//First row and away from edges
 		if(row == 0 && (column >= 1 && column <= this.PETRI_SIZE_COLS-2)){
 			if(this.cellArena[column-1][row].getAlive() == 1)
@@ -469,8 +472,91 @@ public class Petridish {
 		else{
 			System.err.printf("Error occured in checkNighborsExactlyThree() at: row %d | column %d%n", row, column);
 		}
-		return false;
-	}
+                return false;
+        }
+
+        /*
+         * applyCoexistentBehavior()
+         *
+         * Coexistent cells replicate one neighbouring live cell into a
+         * neighbouring empty location without killing any cells.
+         */
+        private void applyCoexistentBehavior(){
+                for(int r = 0; r < PETRI_SIZE_ROWS; r++){
+                        for(int c = 0; c < PETRI_SIZE_COLS; c++){
+                                Cell cell = this.cellArena[c][r];
+                                if(cell.getAlive() == 1 && cell.getSpecies() == Cell.SPECIES_COEXISTENT){
+                                        CellPosition copySource = null;
+                                        CellPosition emptySpot = null;
+                                        for(int dr = -1; dr <= 1; dr++){
+                                                for(int dc = -1; dc <= 1; dc++){
+                                                        if(dr == 0 && dc == 0) continue;
+                                                        int nr = r + dr;
+                                                        int nc = c + dc;
+                                                        if(nr < 0 || nr >= PETRI_SIZE_ROWS || nc < 0 || nc >= PETRI_SIZE_COLS)
+                                                                continue;
+                                                        Cell neighbor = this.cellArena[nc][nr];
+                                                        if(neighbor.getAlive() == 1 && copySource == null){
+                                                                copySource = new CellPosition(nr, nc);
+                                                        }
+                                                        if(neighbor.getAlive() == 0 && emptySpot == null){
+                                                                emptySpot = new CellPosition(nr, nc);
+                                                        }
+                                                }
+                                        }
+                                        if(copySource != null && emptySpot != null){
+                                                Cell source = this.cellArena[copySource.column][copySource.row];
+                                                Cell dest = this.cellArena[emptySpot.column][emptySpot.row];
+                                                dest.makeAlive();
+                                                dest.setSpecies(source.getSpecies());
+                                        }
+                                }
+                        }
+                }
+        }
+
+        /*
+         * applyAggressiveBehavior()
+         *
+         * Aggressive cells consume neighbouring non-aggressive live cells.
+         * For every two cells consumed a new aggressive cell spawns in an
+         * adjacent empty location.
+         */
+        private void applyAggressiveBehavior(){
+                for(int r = 0; r < PETRI_SIZE_ROWS; r++){
+                        for(int c = 0; c < PETRI_SIZE_COLS; c++){
+                                Cell cell = this.cellArena[c][r];
+                                if(cell.getAlive() == 1 && cell.getSpecies() == Cell.SPECIES_AGGRESSIVE){
+                                        int eaten = 0;
+                                        Stack<CellPosition> empty = new Stack<>();
+                                        for(int dr = -1; dr <= 1; dr++){
+                                                for(int dc = -1; dc <= 1; dc++){
+                                                        if(dr == 0 && dc == 0) continue;
+                                                        int nr = r + dr;
+                                                        int nc = c + dc;
+                                                        if(nr < 0 || nr >= PETRI_SIZE_ROWS || nc < 0 || nc >= PETRI_SIZE_COLS)
+                                                                continue;
+                                                        Cell neighbor = this.cellArena[nc][nr];
+                                                        if(neighbor.getAlive() == 1 && neighbor.getSpecies() != Cell.SPECIES_AGGRESSIVE){
+                                                                neighbor.makeDead();
+                                                                eaten++;
+                                                        } else if(neighbor.getAlive() == 0){
+                                                                empty.push(new CellPosition(nr, nc));
+                                                        }
+                                                }
+                                        }
+                                        int spawn = eaten / 2;
+                                        while(spawn > 0 && !empty.isEmpty()){
+                                                CellPosition pos = empty.pop();
+                                                Cell target = this.cellArena[pos.column][pos.row];
+                                                target.makeAlive();
+                                                target.setSpecies(Cell.SPECIES_AGGRESSIVE);
+                                                spawn--;
+                                        }
+                                }
+                        }
+                }
+        }
 	/*
 	 * checkLivingCells()
 	 * 
@@ -514,12 +600,14 @@ public class Petridish {
 	 * and returning back to the GameofLife scope.
 	 * 
 	 */ 
-	public void iterateLife() throws Exception {
-		int timer = 0;
-		while(this.checkLivingCells()){
-			this.checkLifeConditions();
-			this.display();
-			Thread.sleep(250);
+        public void iterateLife() throws Exception {
+                int timer = 0;
+                while(this.checkLivingCells()){
+                        this.checkLifeConditions();
+                        this.applyCoexistentBehavior();
+                        this.applyAggressiveBehavior();
+                        this.display();
+                        Thread.sleep(250);
 			timer++;
 			if(timer == 400){
 				break;
