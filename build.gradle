@@ -2,6 +2,10 @@ plugins {
     id 'application'
 }
 
+java {
+    modularity.inferModulePath = true
+}
+
 repositories {
     mavenCentral()
 }
