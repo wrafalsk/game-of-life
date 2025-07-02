@@ -9,7 +9,7 @@ public class CellTest {
         cell.makeAlive();
         assertEquals(1, cell.getAlive());
         assertEquals('@', cell.getCurrentShape());
-        assertEquals(Cell.SPECIES_NORMAL, cell.getSpecies());
+        assertEquals(CellSpecies.NORMAL, cell.getSpecies());
     }
 
     @Test
@@ -24,10 +24,10 @@ public class CellTest {
     @Test
     void testSpeciesShapes() {
         Cell cell = new Cell();
-        cell.setSpecies(Cell.SPECIES_COEXISTENT);
+        cell.setSpecies(CellSpecies.COEXISTENT);
         cell.makeAlive();
         assertEquals('C', cell.getCurrentShape());
-        cell.setSpecies(Cell.SPECIES_AGGRESSIVE);
+        cell.setSpecies(CellSpecies.AGGRESSIVE);
         assertEquals('X', cell.getCurrentShape());
     }
 }
